@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Student Automated Grade System</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #6a0dad, #000);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .container {
+        width: 95%;
+        max-width: 1300px;
+        background: rgba(0,0,0,0.85);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 40px rgba(255,255,255,0.2);
+        padding: 20px;
+    }
+    h1 { text-align: center; font-weight: 700; margin-bottom: 25px; }
+    .main-content { display: flex; gap: 20px; flex-wrap: wrap; }
+    /* Student Selector */
+    .student-section {
+        flex: 1 1 300px;
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .student-section h2 { text-align: center; margin-bottom: 15px; font-weight: 500; }
+    .student-section input, .student-section button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: none;
+    }
+    .student-section button {
+        background: #8a2be2; color: #fff; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s;
+    }
+    .student-section button:hover { background: #6a0dad; }
+
+    /* Lists */
+    .list-section { flex: 2 1 600px; display: flex; gap: 15px; flex-wrap: wrap; }
+    .list { flex: 1 1 300px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; max-height: 500px; overflow-y: auto; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+    .list h2 { text-align: center; margin-bottom: 10px; font-weight: 500; }
+    .list ul { list-style: none; padding: 0; margin: 0; }
+    .list ul li { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.1); border-radius: 5px; transition: 0.3s; }
+    .list ul li:hover { background: rgba(255,255,255,0.2); }
+    .list ul li input { width: 60px; border-radius: 5px; border: none; text-align: center; padding: 5px; }
+    .delete-btn { background: red; border: none; border-radius: 5px; padding: 5px 8px; color: #fff; cursor: pointer; margin-left: 10px; transition: 0.3s; }
+    .delete-btn:hover { background: darkred; }
+    .average { text-align: center; margin-bottom: 10px; font-size: 18px; font-weight: 500; }
+    .sort-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .sort-buttons button { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: 500; background: #6a0dad; color: #fff; transition: 0.3s; }
+    .sort-buttons button:hover { background: #8a2be2; }
+
+    @media (max-width: 900px) {
+        .main-content { flex-direction: column; }
+        .list-section { flex-direction: column; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Multi-Student Automated Grade System</h1>
+    <div class="main-content">
+        <!-- Student Selection -->
+        <div class="student-section">
+            <h2>Student Management</h2>
+            <input type="text" id="studentNameInput" placeholder="Enter student name">
+            <button onclick="addStudent()">Add / Select Student</button>
+            <ul id="studentList"></ul>
+        </div>
+
+        <!-- Lists Section -->
+        <div class="list-section">
+            <!-- Raw Scores -->
+            <div class="list" id="rawListContainer">
+                <h2>Raw Scores</h2>
+                <div class="sort-buttons">
+                    <button onclick="sortGrades('name')">Sort by Name</button>
+                    <button onclick="sortGrades('score')">Sort by Score</button>
+                </div>
+                <ul id="rawList"></ul>
+            </div>
+
+            <!-- Converted Grades -->
+            <div class="list" id="convertedListContainer">
+                <h2>Converted Grades</h2>
+                <div class="average" id="averageDisplay">Average: 0.00</div>
+                <div class="sort-buttons">
+                    <button onclick="sortGrades('converted')">Sort by 1.00-Scale</button>
+                </div>
+                <ul id="convertedList"></ul>
+
+                <h2>Add Grade</h2>
+                <label for="subject">Subject</label>
+                <input type="text" id="subjectInput" placeholder="Enter subject">
+                <label for="score">Score</label>
+                <input type="number" id="scoreInput" placeholder="0-100" min="0" max="100">
+                <button onclick="addGrade()">Add Grade</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let students = {}; // { studentName: [{subject, score, converted}, ...] }
+let currentStudent = null;
+
+// Load from localStorage
+window.onload = () => {
+    const savedStudents = localStorage.getItem('students');
+    if(savedStudents) {
+        students = JSON.parse(savedStudents);
+        renderStudentList();
+    }
+}
+
+// Add / Select Student
+function addStudent() {
+    const name = document.getElementById('studentNameInput').value.trim();
+    if(!name) return alert("Enter a student name!");
+    if(!students[name]) students[name] = [];
+    currentStudent = name;
+    document.getElementById('studentNameInput').value = '';
+    renderStudentList();
+    updateLists();
+}
+
+// Render student selection list
+function renderStudentList() {
+    const ul = document.getElementById('studentList');
+    ul.innerHTML = '';
+    for(const name in students) {
+        const li = document.createElement('li');
+        li.textContent = name;
+        li.style.cursor = "pointer";
+        li.onclick = () => {
+            currentStudent = name;
+            updateLists();
+        }
+        ul.appendChild(li);
+    }
+}
+
+// Add grade to current student
+function addGrade() {
+    if(!currentStudent) return alert("Select a student first!");
+    const subject = document.getElementById('subjectInput').value.trim();
+    const score = parseFloat(document.getElementById('scoreInput').value.trim());
+    if(!subject || isNaN(score) || score < 0 || score > 100) return alert("Enter valid subject & score (0-100)");
+    
+    students[currentStudent].push({subject, score, converted: convertScore(score)});
+    document.getElementById('subjectInput').value = '';
+    document.getElementById('scoreInput').value = '';
+    saveStudents();
+    updateLists();
+}
+
+// Convert numeric score to 1.00-5.00 scale
+function convertScore(score) {
+    if(score >= 97) return 1.00;
+    if(score >= 94) return 1.25;
+    if(score >= 91) return 1.50;
+    if(score >= 88) return 1.75;
+    if(score >= 85) return 2.00;
+    if(score >= 82) return 2.25;
+    if(score >= 79) return 2.50;
+    if(score >= 76) return 2.75;
+    if(score >= 75) return 3.00;
+    return 5.00;
+}
+
+// Update raw and converted lists for current student
+function updateLists() {
+    const rawList = document.getElementById('rawList');
+    const convertedList = document.getElementById('convertedList');
+    rawList.innerHTML = '';
+    convertedList.innerHTML = '';
+    if(!currentStudent || !students[currentStudent]) return;
+
+    let total = 0;
+    students[currentStudent].forEach((g, index) => {
+        // Raw
+        const liRaw = document.createElement('li');
+        liRaw.innerHTML = `${g.subject} | <input type="number" value="${g.score}" min="0" max="100" onchange="editScore(${index}, this.value)"> <button class="delete-btn" onclick="deleteGrade(${index})">Delete</button>`;
+        rawList.appendChild(liRaw);
+        // Converted
+        const liConv = document.createElement('li');
+        liConv.textContent = `${g.subject} | ${g.converted.toFixed(2)}`;
+        if(g.converted <= 1.50) liConv.style.backgroundColor = "rgba(0,255,0,0.3)";
+        else if(g.converted <= 2.50) liConv.style.backgroundColor = "rgba(255,255,0,0.3)";
+        else liConv.style.backgroundColor = "rgba(255,0,0,0.3)";
+        convertedList.appendChild(liConv);
+
+        total += g.converted;
+    });
+    const avg = students[currentStudent].length > 0 ? (total / students[currentStudent].length).toFixed(2) : "0.00";
+    document.getElementById('averageDisplay').textContent = "Average: " + avg;
+}
+
+// Edit score
+function editScore(index, newScore) {
+    newScore = parseFloat(newScore);
+    if(isNaN(newScore) || newScore < 0 || newScore > 100) { alert("Invalid score!"); updateLists(); return; }
+    students[currentStudent][index].score = newScore;
+    students[currentStudent][index].converted = convertScore(newScore);
+    saveStudents();
+    updateLists();
+}
+
+// Delete grade
+function deleteGrade(index) {
+    students[currentStudent].splice(index, 1);
+    saveStudents();
+    updateLists();
+}
+
+// Save to localStorage
+function saveStudents() { localStorage.setItem('students', JSON.stringify(students)); }
+
+// Sort grades
+function sortGrades(type) {
+    if(!currentStudent || !students[currentStudent]) return;
+    if(type === 'name') students[currentStudent].sort((a,b) => a.subject.localeCompare(b.subject));
+    else if(type === 'score') students[currentStudent].sort((a,b) => b.score - a.score);
+    else if(type === 'converted') students[currentStudent].sort((a,b) => a.converted - b.converted);
+    updateLists();
+}
+</script>
+</body>
+</html>
