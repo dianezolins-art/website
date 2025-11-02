@@ -307,7 +307,7 @@
 
   <section id="home">
     <div class="home-container">
-      <img src="images/received_1228911384285123.jpeg" alt="Prencis Diane C. Zolina" class="profile-pic-home">
+      <img src="https://raw.githubusercontent.com/dianezolins-art/website/main/received_1228911384285123.jpeg" alt="Profile Picture" class="profile-pic-home">
       <h2>Welcome to My Portfolio</h2>
       <p>Hi! I’m <strong>Prencis Diane C. Zolina</strong>, an aspiring IT professional passionate about creativity, design, and innovation. Explore my journey below!</p>
     </div>
