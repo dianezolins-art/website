@@ -1,133 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Automated Grade System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    /* ===== RESET ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #ffdde1;
-      color: #222;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automated Grading System</title>
+<style>
+  /* 🌌 Solar System Background */
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at center, #fff176, #66bb6a, #1b5e20);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 10px;
+    position: relative;
+  }
 
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+  /* Orbit and Planet visuals */
+  .sun {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff59d, #fbc02d, #f57f17);
+    box-shadow: 0 0 80px 30px rgba(255,255,0,0.5);
+    transform: translate(-50%, -50%);
+    z-index: 0;
+  }
 
-    header h1 {
-      color: #ff4f7d;
-      font-size: clamp(1.8em, 4vw, 2.5em);
-    }
+  .orbit {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin linear infinite;
+    pointer-events: none;
+  }
 
-    header p {
-      font-size: clamp(1em, 2vw, 1.2em);
-      color: #555;
-    }
+  @keyframes spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
 
-    .project-container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      padding: 20px;
-      max-width: 900px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+  .orbit:nth-child(2) { width: 400px; height: 400px; animation-duration: 90s; }
+  .orbit:nth-child(3) { width: 700px; height: 700px; animation-duration: 120s; }
 
-    .project-container:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 25px rgba(255, 79, 125, 0.2);
-    }
+  .planet {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    animation: planetOrbit linear infinite;
+  }
 
-    .project-container img {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      margin-bottom: 15px;
-    }
+  @keyframes planetOrbit {
+    from { transform: rotate(0deg) translateX(200px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
+  }
 
-    .project-container h2 {
-      color: #ff4f7d;
-      font-size: clamp(1.5em, 3vw, 2em);
-      margin-bottom: 15px;
-      text-align: center;
-    }
+  .planet1 {
+    width: 20px; height: 20px;
+    background: #81c784;
+    box-shadow: 0 0 15px 5px #a5d6a7;
+    animation-duration: 80s;
+  }
 
-    .project-container p {
-      font-size: clamp(1em, 2vw, 1.1em);
-      margin-bottom: 10px;
-      text-align: center;
-    }
+  /* 📦 Main Container */
+  .container {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    max-width: 900px;
+    width: 100%;
+    z-index: 5;
+  }
 
-    .project-container strong {
-      color: #ff4f7d;
-    }
+  h1 {
+    text-align: center;
+    color: #1b5e20;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
 
-    .project-links {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 15px;
-    }
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+  }
 
-    .project-links a {
-      text-decoration: none;
-      color: white;
-      background: linear-gradient(135deg, #ff8fab, #ff4f7d);
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-weight: 600;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+  input, button {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: 0.3s;
+    flex: 1;
+  }
 
-    .project-links a:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 79, 125, 0.3);
-    }
+  input:focus {
+    border-color: #66bb6a;
+    outline: none;
+    box-shadow: 0 0 5px #66bb6a;
+  }
 
-    @media (max-width: 600px) {
-      .project-container img {
-        width: 80px;
-        height: 80px;
-      }
-      .project-container h2 {
-        font-size: 1.5em;
-      }
-    }
-  </style>
+  button {
+    background: linear-gradient(90deg, #fff176, #66bb6a);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #1b5e20;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+
+  /* 👩‍🎓 Student Boxes */
+  .student-box {
+    margin-top: 25px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease;
+  }
+
+  .student-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #1b5e20;
+    border-bottom: 2px solid #66bb6a;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #a5d6a7;
+  }
+
+  .avg {
+    text-align: right;
+    margin-top: 8px;
+    font-weight: bold;
+    color: #2e7d32;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    form { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>Automated Grade System</h1>
-    <p>A web-based system to manage student grades automatically with real-time calculations.</p>
-  </header>
+<!-- ☀️ Solar system background -->
+<div class="sun"></div>
+<div class="orbit"></div>
+<div class="orbit"></div>
+<div class="planet planet1"></div>
 
-  <div class="project-container">
-    <img src="https://cdn-icons-png.flaticon.com/512/4144/4144707.png" alt="Automated Grade System">
-    <h2>Automated Grade System</h2>
-    <p>This web app calculates, sorts, and stores student grades locally in the browser using <strong>localStorage</strong>.</p>
-    <p><strong>Tech Stack:</strong> HTML, CSS, JavaScript (vanilla), localStorage</p>
+<div class="container">
+  <h1>Automated Grading System</h1>
 
-    <div class="project-links">
-      <a href="Automated%20Grade%20System.html" target="_blank">Live Demo</a>
-      <a href="https://github.com/dianezolins-art/website" target="_blank">GitHub</a>
-    </div>
-  </div>
+  <form id="gradeForm">
+    <input type="text" id="studentName" placeholder="Student Name" required>
+    <input type="text" id="subject" placeholder="Subject" required>
+    <input type="number" id="score" placeholder="Score (0–100)" min="0" max="100" required>
+    <button type="submit">Add Grade</button>
+  </form>
 
+  <div id="studentsContainer"></div>
+</div>
+
+<script>
+  const form = document.getElementById('gradeForm');
+  const container = document.getElementById('studentsContainer');
+  let grades = JSON.parse(localStorage.getItem('grades')) || [];
+
+  function gradeToEquivalent(grade) {
+    if (grade >= 99) return "1.00";
+    if (grade >= 96) return "1.25";
+    if (grade >= 93) return "1.50";
+    if (grade >= 90) return "1.75";
+    if (grade >= 87) return "2.00";
+    if (grade >= 84) return "2.25";
+    if (grade >= 81) return "2.50";
+    if (grade >= 78) return "2.75";
+    if (grade >= 75) return "3.00";
+    return "5.00 (Failed)";
+  }
+
+  function average(name) {
+    const records = grades.filter(g => g.name === name);
+    const total = records.reduce((acc, g) => acc + g.score, 0);
+    return (total / records.length).toFixed(2);
+  }
+
+  function render() {
+    container.innerHTML = '';
+    const grouped = {};
+
+    grades.forEach(g => {
+      if (!grouped[g.name]) grouped[g.name] = [];
+      grouped[g.name].push(g);
+    });
+
+    Object.keys(grouped).sort().forEach(name => {
+      const box = document.createElement('div');
+      box.className = 'student-box';
+
+      const header = document.createElement('div');
+      header.className = 'student-name';
+      header.textContent = name;
+      box.appendChild(header);
+
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Score</th>
+            <th>Equivalent</th>
+          </tr>
+        </thead>
+      `;
+
+      const tbody = document.createElement('tbody');
+      grouped[name].forEach(g => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${g.subject}</td>
+          <td>${g.score}</td>
+          <td>${gradeToEquivalent(g.score)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      box.appendChild(table);
+
+      const avg = document.createElement('div');
+      avg.className = 'avg';
+      avg.textContent = `Average: ${average(name)}`;
+      box.appendChild(avg);
+
+      container.appendChild(box);
+    });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('studentName').value.trim();
+    const subject = document.getElementById('subject').value.trim();
+    const score = parseFloat(document.getElementById('score').value);
+
+    if (!name || !subject || isNaN(score) || score < 0 || score > 100) {
+      alert('Enter valid inputs.');
+      return;
+    }
+
+    grades.push({ name, subject, score });
+    localStorage.setItem('grades', JSON.stringify(grades));
+    render();
+    form.reset();
+  });
+
+  render();
+</script>
 </body>
 </html>
