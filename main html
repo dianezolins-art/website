@@ -342,22 +342,21 @@
   <img src="https://cdn-icons-png.flaticon.com/512/4144/4144707.png" alt="Automated Grade System">
   <h3>Automated Grade System</h3>
   <p>A web-based system to manage student grades automatically with real-time calculations, sorting, and persistent storage in the browser.</p>
-<p><strong>Tech Stack:</strong> HTML, CSS, JavaScript (vanilla), localStorage</p>
-
+  <p><strong>Tech Stack:</strong> HTML, CSS, JavaScript (vanilla), localStorage</p>
   <div class="project-links">
-    <a href="file:///C:/Users/Princess%20Diane/Downloads/Automated%20Grade%20System.html" target="_blank">Live Demo</a> |
-    <a href="https://github.com/username/automated-grade-system" target="_blank">GitHub</a>
+     <a href="https://dianezolins-art.github.io/website/Automated%20Grade%20System.html" target="_blank">Live Demo</a> |
+    <a href="https://github.com/dianezolins-art/website/tree/main/Automated%20Grade%20System" target="_blank">GitHub</a>
   </div>
 </div>
 
-    <div class="project">
+<div class="project">
   <img src="https://cdn-icons-png.flaticon.com/512/2910/2910760.png" alt="Calculator">
   <h3>Calculator</h3>
   <p>An interactive online calculator with a functional display, arithmetic operations, and history tracking for recent calculations.</p>
   <p><strong>Tech Stack:</strong> HTML, CSS, JavaScript</p>
   <div class="project-links">
-    <a href="#" target="_blank">Live Demo</a> |
-    <a href="file:///C:/Users/Princess%20Diane/Downloads/Calculator.html" target="_blank">Source Code</a>
+    <a href="https://dianezolins-art.github.io/website/Calculator.html" target="_blank">Live Demo</a> |
+    <a href="https://github.com/dianezolins-art/website/tree/main/Calculator" target="_blank">Source Code</a> 
   </div>
 </div>
 
